@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id
+  name String
+  surname String
+  status String
+  email String
+  avatar String
+  posts Post[]
+  hobbies Hobby[]
+  contacts Contact[]
+  birthdate String
+  country Country
+  state State
+  city City
+  pronouns String
+  companies Organization[]
+  nationality String
+  residence String
+  phone String
+  description String
+  actualjob String
+  experiences Organization[]
+  skills Skill[]
+  languages Language[]
+  active Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // certifiedSkills 
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  userId String 
+  // relacion de usuario
+
+  body String
+  multimedia String
+  comments Comment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reactions Reaction[]
+}
+
+model Organization {
+  id Int @id 
+  name String 
+  type String
+  employees User[]
+  organizationField Field[]
+  website String
+  posts Post[]
+  //joboffers
+  dateOfFounding String
+  createdAt DateTime @default(now())
+}
+
+model Skill {
+ id Int @id @default(autoincrement())
+ name String
+ type Field[]
+ level String
+}
+
+model Language {
+
+}
+
+model Hobby {
+
+}
+
+model Time {
+
+}
+
+model Country {
+
+}
+
+model State {
+
+}
+
+model City {
+
+}
+
+model Contact {
+
+}
+
+model Reaction {
+
+}
+
+model Comments {
+
+}
+
+model Field {
+  
+}
