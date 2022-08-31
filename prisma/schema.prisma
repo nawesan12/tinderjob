@@ -125,7 +125,7 @@ model user {
   email                                           String?        @db.VarChar(255)
   password                                        String         @db.VarChar(32)
   createdAt                                       DateTime?      @default(now()) @db.Timestamp(0)
-  avatar                                          String?        @db.VarChar(1024)
+  avatar                                          String?        @db.VarChar(2048)
   birthdate                                       String?        @db.VarChar(45)
   pronouns                                        String?        @db.VarChar(10)
   nationality                                     String?        @db.VarChar(45)
