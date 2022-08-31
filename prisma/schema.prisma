@@ -7,11 +7,152 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          String @id @default(cuid())
-  name        String
-  email       String
-  password    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model city {
+  id       Int     @id
+  name     String? @db.VarChar(45)
+  code     String? @db.VarChar(45)
+  state_id Int
+  state    state   @relation(fields: [state_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "city_ibfk_1")
+  user     user[]
+
+  @@index([state_id], map: "state_idx")
+}
+
+model comment {
+  id         Int     @id
+  body       String? @db.VarChar(45)
+  createdAt  String? @db.VarChar(45)
+  post_id    Int
+  written_by String  @db.VarChar(45)
+  post       post    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_ibfk_1")
+  user       user    @relation(fields: [written_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "comment_ibfk_2")
+
+  @@index([post_id], map: "post_id_idx")
+  @@index([written_by], map: "written_by_idx")
+}
+
+model country {
+  id    Int     @id
+  name  String? @db.VarChar(45)
+  code  String? @db.VarChar(45)
+  state state[]
+  user  user[]
+}
+
+model field {
+  id           Int            @id
+  name         String?        @db.VarChar(45)
+  type         String?        @db.VarChar(45)
+  organization organization[]
+  skill        skill[]
+}
+
+model hobby {
+  id      Int     @id
+  name    String? @db.VarChar(45)
+  user_id String  @db.VarChar(45)
+  user    user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hobby_ibfk_1")
+
+  @@index([user_id], map: "user_id_idx")
+}
+
+model language {
+  id    Int     @id @default(autoincrement())
+  name  String? @db.VarChar(45)
+  level String? @db.VarChar(45)
+  user  user[]
+}
+
+model organization {
+  id                                      Int     @id @default(autoincrement())
+  name                                    String? @db.VarChar(45)
+  website                                 String? @db.VarChar(45)
+  type                                    String? @db.VarChar(45)
+  dateOfFounding                          String? @db.VarChar(45)
+  createdAt                               String? @db.VarChar(45)
+  field_id                                Int
+  founder_id                              String  @db.VarChar(45)
+  field                                   field   @relation(fields: [field_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "organization_ibfk_1")
+  user_organization_founder_idTouser      user    @relation("organization_founder_idTouser", fields: [founder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "organization_ibfk_2")
+  user_organizationTouser_organization_id user[]  @relation("organizationTouser_organization_id")
+
+  @@index([field_id], map: "fk_organization_field1_idx")
+  @@index([founder_id], map: "founder_idx")
+}
+
+model post {
+  id         Int       @id @default(autoincrement())
+  body       String?   @db.VarChar(1024)
+  multimedia String?   @db.VarChar(500)
+  createdAt  DateTime? @db.Timestamp(0)
+  updatedAt  String?   @db.VarChar(45)
+  author_id  String    @db.VarChar(45)
+  user       user      @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "post_ibfk_1")
+  comment    comment[]
+
+  @@index([author_id], map: "author_idx")
+}
+
+model skill {
+  id       Int     @id @default(autoincrement())
+  name     String? @db.VarChar(45)
+  level    String? @db.VarChar(45)
+  type     String? @db.VarChar(45)
+  field_id Int
+  field    field   @relation(fields: [field_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "skill_ibfk_1")
+
+  @@index([field_id], map: "fk_skill_field1_idx")
+}
+
+model state {
+  id         Int     @default(autoincrement()) @unique
+  name       String? @db.VarChar(45)
+  code       String? @db.VarChar(45)
+  user_id    String  @db.VarChar(50)
+  country_id Int
+  country    country @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "state_ibfk_1")
+  city       city[]
+  user       user[]
+
+  @@id([id, user_id])
+  @@index([country_id], map: "state_ibfk_1_idx")
+}
+
+model user {
+  id                                              String         @id @db.VarChar(50)
+  name                                            String         @db.VarChar(16)
+  surname                                         String?        @db.VarChar(45)
+  email                                           String?        @db.VarChar(255)
+  password                                        String         @db.VarChar(32)
+  createdAt                                       DateTime?      @default(now()) @db.Timestamp(0)
+  avatar                                          String?        @db.VarChar(1024)
+  birthdate                                       String?        @db.VarChar(45)
+  pronouns                                        String?        @db.VarChar(10)
+  nationality                                     String?        @db.VarChar(45)
+  residence                                       String?        @db.VarChar(45)
+  phone                                           String?        @db.VarChar(45)
+  description                                     String?        @db.VarChar(1024)
+  actualJob                                       String?        @db.VarChar(45)
+  active                                          Int?           @db.TinyInt
+  status                                          String?        @db.VarChar(45)
+  language_id                                     Int
+  organization_id                                 Int
+  country_id                                      Int
+  state_id                                        Int
+  city_id                                         Int
+  language                                        language       @relation(fields: [language_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
+  organization_organizationTouser_organization_id organization   @relation("organizationTouser_organization_id", fields: [organization_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_2")
+  country                                         country        @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_3")
+  state                                           state          @relation(fields: [state_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_4")
+  city                                            city           @relation(fields: [city_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_5")
+  comment                                         comment[]
+  hobby                                           hobby[]
+  organization_organization_founder_idTouser      organization[] @relation("organization_founder_idTouser")
+  post                                            post[]
+
+  @@index([city_id], map: "cty_id_idx")
+  @@index([country_id], map: "fk_user_country1_idx")
+  @@index([language_id], map: "fk_user_language1_idx")
+  @@index([organization_id], map: "fk_user_organization1_idx")
+  @@index([state_id], map: "state_id_idx")
 }
